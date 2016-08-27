@@ -11,14 +11,26 @@ import pandas as pd
 # d = pd.DataFrame.from_csv("sp500_constituents.csv")
 # symbols = d.index.values
 
-folder = "yahoo_cache.etf"
-etfs = pd.DataFrame.from_csv("ETFList.csv")
-symbols = etfs.index
+# folder = "yahoo_cache.etf"
+# etfs = pd.DataFrame.from_csv("ETFList.csv")
+# symbols = etfs.index
 
 # folder = "yahoo_cache.russell_3000"
 # symbols = []
 # for line in fileinput.input("russell_3000"):
 #     symbols.append(line.strip().replace(".", "-"))
+
+folder = "yahoo_cache.nasdaq"
+d = pd.DataFrame.from_csv("NASDAQ.csv")
+
+symbols = d.index.values
+
+symbols = map(lambda s: s.replace(".", "-").strip(), symbols)
+symbols = filter(lambda s: s.replace("-", "").isalpha(), symbols)
+
+print symbols
+print len(symbols)
+
 
 for symbol in symbols:
 
@@ -51,6 +63,9 @@ for symbol in symbols:
         res = requests.get(url).json()
 
         assert res["chart"]["error"] is None, "!"
+
+        if len(res["chart"]["result"]) == 0:
+            break
 
         if "timestamp" not in res["chart"]["result"][0]:
             break

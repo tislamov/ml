@@ -5,32 +5,20 @@ import lxml.html
 import os
 import json
 import fileinput
+import pandas as pd
 
-# folder = "yahoo_cache"
-# data = requests.get("http://www.cboe.com/products/snp500.aspx").content
-#
-# root = lxml.html.fromstring(data)
-#
+# folder = "yahoo_cache.sp500"
+# d = pd.DataFrame.from_csv("sp500_constituents.csv")
+# symbols = d.index.values
+
+folder = "yahoo_cache.etf"
+etfs = pd.DataFrame.from_csv("ETFList.csv")
+symbols = etfs.index
+
+# folder = "yahoo_cache.russell_3000"
 # symbols = []
-#
-# for table in root.findall(".//table"):
-#     for tr in table.findall(".//tr"):
-#         if tr[1].text and tr.get("height") == "20":
-#             symbol = tr[1].text.strip()
-#             symbols.append(symbol)
-#
-# print len(symbols)
-
-# folder = "yahoo_cache.etf"
-# etfs = pd.DataFrame.from_csv("ETFList.csv")
-# symbols = etfs.index
-
-folder = "yahoo_cache.russell_3000"
-symbols = []
-for line in fileinput.input("russell_3000"):
-    symbols.append(line.strip().replace(".", "-"))
-print len(symbols)
-
+# for line in fileinput.input("russell_3000"):
+#     symbols.append(line.strip().replace(".", "-"))
 
 for symbol in symbols:
 

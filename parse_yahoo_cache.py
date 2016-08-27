@@ -4,8 +4,9 @@ import pandas as pd
 
 pd.set_option("display.width", 1000)
 
-# folder, result_filename = "yahoo_cache", "sp500_1month.csv"
-# folder, result_filename = "yahoo_cache.etf", "etf_1month.csv"
+# folder, result_filename = "yahoo_cache.russell_3000", "russell3000_1month.csv"
+# folder, result_filename = "yahoo_cache.sp500", "sp500_1month.csv"
+folder, result_filename = "yahoo_cache.etf", "etf_1month.csv"
 
 temp = []
 
@@ -42,8 +43,8 @@ for filename in os.listdir(folder):
     # if len(temp) == 10:
     #     break
 
+print len(temp)
 combined = pd.concat(temp, 1)
 print combined
-print len(temp)
 
 combined.to_csv(result_filename)

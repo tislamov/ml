@@ -4,7 +4,7 @@ import pytz
 import lxml.html
 import os
 import json
-import pandas as pd
+import fileinput
 
 # folder = "yahoo_cache"
 # data = requests.get("http://www.cboe.com/products/snp500.aspx").content
@@ -21,23 +21,20 @@ import pandas as pd
 #
 # print len(symbols)
 
-folder = "yahoo_cache.etf"
-etfs = pd.DataFrame.from_csv("ETFList.csv")
-symbols = etfs.index
+# folder = "yahoo_cache.etf"
+# etfs = pd.DataFrame.from_csv("ETFList.csv")
+# symbols = etfs.index
+
+folder = "yahoo_cache.russell_3000"
+symbols = []
+for line in fileinput.input("russell_3000"):
+    symbols.append(line.strip().replace(".", "-"))
+print len(symbols)
 
 
 for symbol in symbols:
 
     print symbol
-
-    if symbol == "BRK.B":
-        symbol = "BRK-B"
-
-    if symbol == "BF.B":
-        symbol = "BF-B"
-
-    if symbol == "UA.C":
-        symbol = "UA-C"
 
     filename = "{}/{}.json".format(folder, symbol)
 
@@ -47,9 +44,11 @@ for symbol in symbols:
 
     while True:
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.timezone("UTC"))
+        # now = datetime.datetime.utcnow().replace(tzinfo=pytz.timezone("UTC"))
 
-        dt = now - datetime.timedelta(days=30)
+        now = datetime.datetime(2016, 8, 26, 17).replace(tzinfo=pytz.timezone("US/Eastern"))
+
+        dt = now - datetime.timedelta(days=29)
 
         print now - dt
 

@@ -1,36 +1,18 @@
-import requests
 import datetime
-import pytz
-import lxml.html
 import os
 import json
-import fileinput
-import pandas as pd
 
-# folder = "yahoo_cache.sp500"
-# d = pd.DataFrame.from_csv("sp500_constituents.csv")
-# symbols = d.index.values
+import requests
+import pytz
 
-# folder = "yahoo_cache.etf"
-# etfs = pd.DataFrame.from_csv("ETFList.csv")
-# symbols = etfs.index
+folder = "yahoo_cache"
 
-# folder = "yahoo_cache.russell_3000"
-# symbols = []
-# for line in fileinput.input("russell_3000"):
-#     symbols.append(line.strip().replace(".", "-"))
+floats = json.load(open("floats.json"))
 
-folder = "yahoo_cache.nasdaq"
-d = pd.DataFrame.from_csv("NASDAQ.csv")
-
-symbols = d.index.values
-
-symbols = map(lambda s: s.replace(".", "-").strip(), symbols)
-symbols = filter(lambda s: s.replace("-", "").isalpha(), symbols)
+symbols = sorted(floats.keys())
 
 print symbols
 print len(symbols)
-
 
 for symbol in symbols:
 
@@ -44,18 +26,16 @@ for symbol in symbols:
 
     while True:
 
-        # now = datetime.datetime.utcnow().replace(tzinfo=pytz.timezone("UTC"))
-
         now = datetime.datetime(2016, 8, 26, 17).replace(tzinfo=pytz.timezone("US/Eastern"))
 
-        dt = now - datetime.timedelta(days=29)
+        dt = now - datetime.timedelta(days=28)
 
         print now - dt
 
         period2 = int((now - datetime.datetime(1970, 1, 1, tzinfo=pytz.timezone("UTC"))).total_seconds())
         period1 = int((dt - datetime.datetime(1970, 1, 1, tzinfo=pytz.timezone("UTC"))).total_seconds())
 
-        url = "https://query1.finance.yahoo.com/v7/finance/chart/{}?period2={}&period1={}&interval=1m&indicators=quote&includeTimestamps=true&includePrePost=false&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com".format(
+        url = "https://query1.finance.yahoo.com/v7/finance/chart/{}?period2={}&period1={}&interval=1m&indicators=quote&includeTimestamps=true&includePrePost=true&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com".format(
             symbol,
             period2,
             period1)

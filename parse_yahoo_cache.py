@@ -4,9 +4,7 @@ import pandas as pd
 
 pd.set_option("display.width", 1000)
 
-# folder, result_filename = "yahoo_cache.russell_3000", "russell3000_1month.csv"
-# folder, result_filename = "yahoo_cache.sp500", "sp500_1month.csv"
-folder, result_filename = "yahoo_cache.etf", "etf_1month.csv"
+folder, result_filename = "yahoo_cache", "1month.csv"
 
 temp = []
 
@@ -48,3 +46,5 @@ combined = pd.concat(temp, 1)
 print combined
 
 combined.to_csv(result_filename)
+combined = combined.astype("float16")
+combined.to_pickle("1month.pkl")

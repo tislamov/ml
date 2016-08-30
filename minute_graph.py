@@ -58,7 +58,7 @@ data["ts"] = data["dt"].apply(date2num, 1)
 print data
 
 fig, ax = plt.subplots()
-candlestick_ohlc(ax, data[["ts", "o", "h", "l", "c"]].values, width=0.0005)
+candlestick_ohlc(ax, data[["ts", "o", "h", "l", "c"]].values, width=0.0005, colorup="g")
 ax.xaxis_date()
 ax.autoscale_view()
 plt.title("{} - {}".format(args.symbol, args.date))

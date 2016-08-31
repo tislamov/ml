@@ -17,12 +17,11 @@ args = parser.parse_args()
 print args.symbol
 
 if args.date == "now":
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.timezone("UTC"))
+    now = datetime.datetime.now().replace(hour=15, minute=0).replace(tzinfo=pytz.timezone("UTC"))
 else:
-    _now = datetime.datetime.utcnow()
-    now = datetime.datetime.strptime(args.date, "%Y-%m-%d").replace(hour=_now.hour, minute=_now.minute).replace(tzinfo=pytz.timezone("UTC"))
+    now = datetime.datetime.strptime(args.date, "%Y-%m-%d").replace(hour=15, minute=0).replace(tzinfo=pytz.timezone("UTC"))
 
-start = datetime.datetime(now.year, now.month, now.day).replace(tzinfo=pytz.timezone("UTC"))
+start = datetime.datetime(now.year, now.month, now.day, 12, 30).replace(tzinfo=pytz.timezone("UTC"))
 
 print now, start
 
@@ -50,7 +49,7 @@ data.columns = ["ts", "o", "h", "l", "c", "v"]
 data["dt"] = pd.to_datetime(data["ts"], unit="s")
 data.drop("ts", 1, inplace=True)
 data.set_index("dt", inplace=True)
-data = data.tz_localize("UTC").tz_convert("US/Eastern")
+data = data.tz_localize("UTC").tz_convert("US/Eastern").tz_localize(None)
 
 data["dt"] = data.index
 data["ts"] = data["dt"].apply(date2num, 1)

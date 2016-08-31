@@ -2,20 +2,32 @@ import pandas as pd
 import requests
 import json
 import traceback
+from StringIO import StringIO
 
-stocks1 = pd.DataFrame.from_csv("NASDAQ.csv")
-stocks2 = pd.DataFrame.from_csv("NYSE.csv")
+urls = [
+    "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NASDAQ&render=download",
+    "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NYSE&render=download",
+    "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=AMEX&render=download",
+]
 
-stocks1.index = stocks1.index.str.strip()
-stocks2.index = stocks2.index.str.strip()
+symbols = []
+for url in urls:
+    content = requests.get(url).content
+    d = pd.DataFrame.from_csv(StringIO(content))
+    symbols += list(d.index.values)
 
-symbols = sorted(set(list(stocks1.index.values) + list(stocks2.index.values)))
+symbols = map(lambda s: s.strip(), symbols)
+
+symbols = sorted(set(symbols))
+
+symbols = filter(lambda s: (s.find("^") == -1 and s.find(".") == -1), symbols)
 
 flts = {}
 
 for symbol in symbols:
 
-    url = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/{}?formatted=true&crumb=f%2F19h1vPOPi&lang=en-US&region=US&modules=defaultKeyStatistics%2CfinancialData%2CcalendarEvents&corsDomain=finance.yahoo.com".format(symbol)
+    url = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/{}?formatted=true&crumb=f%2F19h1vPOPi&lang=en-US&region=US&modules=defaultKeyStatistics%2CfinancialData%2CcalendarEvents&corsDomain=finance.yahoo.com".format(
+        symbol)
 
     while True:
         try:
@@ -33,8 +45,8 @@ for symbol in symbols:
     except:
         print symbol, "ERR!"
 
-    # if len(flts) == 5:
-    #     break
-
+        # if len(flts) == 5:
+        #     break
 
 json.dump(flts, open("floats.json", "w"), indent=4)
+print len(flts)

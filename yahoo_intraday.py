@@ -26,9 +26,9 @@ for symbol in symbols:
 
     while True:
 
-        now = datetime.datetime(2016, 8, 26, 17).replace(tzinfo=pytz.timezone("US/Eastern"))
+        now = datetime.datetime(2016, 8, 31, 23, 59).replace(tzinfo=pytz.timezone("US/Eastern"))
 
-        dt = now - datetime.timedelta(days=28)
+        dt = now - datetime.timedelta(days=30)
 
         print now - dt
 
@@ -51,6 +51,10 @@ for symbol in symbols:
             break
 
         print len(res["chart"]["result"][0]["timestamp"])
+
+        first_ts, last_ts = res["chart"]["result"][0]["timestamp"][0], res["chart"]["result"][0]["timestamp"][-1]
+
+        print datetime.datetime.fromtimestamp(first_ts), datetime.datetime.fromtimestamp(last_ts)
 
         if len(res["chart"]["result"][0]["timestamp"]) > 100:
             json.dump(res, open(filename, "w"), indent=4)

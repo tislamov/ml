@@ -7,28 +7,25 @@ import matplotlib.pyplot as plt
 from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num
 
-
 pd.set_option("display.width", 1000)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--symbol", default="AAPL")
 parser.add_argument("--date", default="now")
 args = parser.parse_args()
-print args.symbol
 
 if args.date == "now":
     now = datetime.datetime.now().replace(hour=15, minute=0).replace(tzinfo=pytz.timezone("UTC"))
 else:
-    now = datetime.datetime.strptime(args.date, "%Y-%m-%d").replace(hour=15, minute=0).replace(tzinfo=pytz.timezone("UTC"))
+    now = datetime.datetime.strptime(args.date, "%Y-%m-%d").replace(hour=15, minute=0).replace(
+        tzinfo=pytz.timezone("UTC"))
 
 start = datetime.datetime(now.year, now.month, now.day, 12, 30).replace(tzinfo=pytz.timezone("UTC"))
 
-print now, start
+print args.symbol, start, now
 
 period1 = int((start - datetime.datetime(1970, 1, 1, tzinfo=pytz.timezone("UTC"))).total_seconds())
 period2 = int((now - datetime.datetime(1970, 1, 1, tzinfo=pytz.timezone("UTC"))).total_seconds())
-
-print period1, period2
 
 url = "https://query1.finance.yahoo.com/v7/finance/chart/{}?period2={}&period1={}&interval=1m&indicators=quote&includeTimestamps=true&includePrePost=true&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com".format(
     args.symbol,

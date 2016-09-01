@@ -4,9 +4,9 @@ import pandas as pd
 
 pd.set_option("display.width", 1000)
 
-folder, result_filename = "yahoo_cache", "1month.csv"
+folder, result_filename = "yahoo_cache", "august.h5"
 
-temp = []
+store = pd.HDFStore(result_filename)
 
 for filename in os.listdir(folder):
     symbol, _ = os.path.splitext(filename)
@@ -27,7 +27,7 @@ for filename in os.listdir(folder):
         row_low = low[i]
         row_close = close[i]
         row_volume = volume[i]
-        rows.append({"ts": ts, "{}_o".format(symbol): row_open, "{}_h".format(symbol): row_high, "{}_l".format(symbol): row_low, "{}_c".format(symbol): row_close, "{}_v".format(symbol): row_volume})
+        rows.append({"ts": ts, "o": row_open, "h": row_high, "l": row_low, "c": row_close, "v": row_volume})
 
     d = pd.DataFrame(rows)
     d["dt"] = pd.to_datetime(d["ts"], unit="s")
@@ -36,15 +36,6 @@ for filename in os.listdir(folder):
 
     d = d.tz_localize("UTC").tz_convert("US/Eastern")
 
-    temp.append(d)
+    store[symbol] = d
 
-    # if len(temp) == 10:
-    #     break
-
-print len(temp)
-combined = pd.concat(temp, 1)
-print combined
-
-combined.to_csv(result_filename)
-combined = combined.astype("float16")
-combined.to_pickle("1month.pkl")
+store.close()

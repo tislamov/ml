@@ -1,38 +1,58 @@
 import json
 import pandas as pd
-import numpy as np
+import multiprocessing
+from pyspark import SparkContext
+import matplotlib.pyplot as plt
+
+pd.set_option("display.max_rows", 10000)
+
+
+def process_item(item):
+    symbol, flt = item
+
+    if symbol not in pd.HDFStore("daily.h5"):
+        return
+
+    daily = pd.read_hdf("daily.h5", symbol)
+
+    d = pd.read_hdf("august.h5", symbol)
+
+    d["d"] = d.index.date
+
+    for g in d.groupby("d"):
+        # get previous day close
+        daily_before = daily[:g[0] - pd.Timedelta(days=1)]
+        if daily_before.shape[0] > 0:
+            prev_c = daily_before.iloc[-1]["Close"]
+            pre_d = g[1].between_time("09:00", "09:29")
+
+            if pre_d.shape[0] > 0:
+                if 1 < prev_c < 10 and flt < 20e6:
+                    r = {"symbol": symbol, "flt": flt, "prev_close": prev_c, "pre_d_shape": pre_d.shape[0],
+                         "d": g[0], "pre_high": pre_d["h"].max()}
+                    print r
+                    yield r
+
 
 flts = json.load(open("floats.json"))
 
-# symbols = map(lambda s: s[0], filter(lambda s: s[1] < 10000000, flts.items()))
+sc = SparkContext()
 
-d = pd.read_pickle("1month.pkl")
+items_RDD = sc.parallelize(flts.items(), multiprocessing.cpu_count() * 5)
 
-symbols = map(lambda c: c.split("_")[0], filter(lambda c: c.endswith("_c"), d.columns.values))
+result = items_RDD.flatMap(process_item).collect()
 
-close = d.between_time("15:59", "15:59")[map(lambda s: "{}_c".format(s), symbols)]
-close.index = close.index.date
+sc.stop()
 
-pre_d = d.between_time("09:00", "09:29")[map(lambda s: "{}_h".format(s), symbols)]
+result = pd.DataFrame(result)
+result.to_pickle("scanner.pkl")
+print result
 
-pre_d["d"] = pre_d.index.date
+result = pd.read_pickle("scanner.pkl")
 
-dates = close.index.values
+result["gap"] = (result["pre_high"] - result["prev_close"]) / result["prev_close"]
+print result["gap"].mean(), result["gap"].median(), result["gap"].max()
+result = result[(result["pre_d_shape"] > 3) & (result["gap"] > .04)].sort_values("d")
 
-print dates
-
-for g in pre_d.groupby("d"):
-    dp = np.where(dates == g[0])[0][0]
-
-    if dp > 0:
-        prev_dt = dates[dp - 1]
-        print g[0], g[1].shape, "prev_dt", prev_dt
-
-        for symbol in symbols:
-            prev_close = close.loc[prev_dt, "{}_c".format(symbol)]
-            if type(prev_close) == np.float16 and ~np.isnan(prev_close):
-                cur_high = g[1]["{}_h".format(symbol)].dropna()
-                if cur_high.shape[0] > 0:
-                    cur_high_mean = cur_high.max()
-                    if cur_high_mean >= prev_close * 1.04:
-                        print symbol, prev_close, cur_high_mean, cur_high.shape, "{}M".format(int(flts[symbol] / 1000000))
+print result
+print result.shape

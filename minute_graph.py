@@ -8,6 +8,7 @@ from matplotlib.finance import candlestick_ohlc
 from matplotlib.dates import date2num
 
 pd.set_option("display.width", 1000)
+pd.set_option("display.max_rows", 10000)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--symbol", default="AAPL")

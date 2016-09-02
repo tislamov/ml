@@ -6,10 +6,25 @@ import requests
 import pytz
 
 folder = "yahoo_cache"
+folder = "yahoo_cache_spdr"
 
-floats = json.load(open("floats.json"))
+# floats = json.load(open("floats.json"))
+#
+# symbols = sorted(floats.keys())
 
-symbols = sorted(floats.keys())
+symbols = [
+    "XLY",
+    "XLP",
+    "XLE",
+    "XLFS",
+    "XLF",
+    "XLV",
+    "XLI",
+    "XLB",
+    "XLRE",
+    "XLK",
+    "XLU",
+]
 
 print symbols
 print len(symbols)
@@ -26,16 +41,16 @@ for symbol in symbols:
 
     while True:
 
-        now = datetime.datetime(2016, 8, 31, 23, 59).replace(tzinfo=pytz.timezone("US/Eastern"))
+        now = datetime.datetime(2016, 9, 1, 23, 59).replace(tzinfo=pytz.timezone("US/Eastern"))
 
-        dt = now - datetime.timedelta(days=30)
+        dt = now - datetime.timedelta(days=29)
 
         print now - dt
 
         period2 = int((now - datetime.datetime(1970, 1, 1, tzinfo=pytz.timezone("UTC"))).total_seconds())
         period1 = int((dt - datetime.datetime(1970, 1, 1, tzinfo=pytz.timezone("UTC"))).total_seconds())
 
-        url = "https://query1.finance.yahoo.com/v7/finance/chart/{}?period2={}&period1={}&interval=1m&indicators=quote&includeTimestamps=true&includePrePost=true&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com".format(
+        url = "https://query1.finance.yahoo.com/v7/finance/chart/{}?period2={}&period1={}&interval=1m&indicators=quote&includeTimestamps=true&includePrePost=false&events=div%7Csplit%7Cearn&corsDomain=finance.yahoo.com".format(
             symbol,
             period2,
             period1)

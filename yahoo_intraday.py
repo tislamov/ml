@@ -7,6 +7,7 @@ import pytz
 
 folder = "yahoo_cache"
 folder = "yahoo_cache_spdr"
+folder = "yahoo_cache_etf"
 
 # floats = json.load(open("floats.json"))
 #
@@ -25,6 +26,8 @@ symbols = [
     "XLK",
     "XLU",
 ]
+
+symbols = ["SPY"]
 
 print symbols
 print len(symbols)

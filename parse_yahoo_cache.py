@@ -6,6 +6,7 @@ pd.set_option("display.width", 1000)
 
 folder, result_filename = "yahoo_cache", "august.h5"
 folder, result_filename = "yahoo_cache_spdr", "spdr.h5"
+folder, result_filename = "yahoo_cache_etf", "etf.h5"
 
 store = pd.HDFStore(result_filename)
 

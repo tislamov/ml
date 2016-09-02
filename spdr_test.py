@@ -37,7 +37,7 @@ symbols = filter(lambda s: s not in ["XLFS", "XLRE"], symbols)
 temp = []
 for symbol in symbols:
     d = store[symbol]
-    d = d.resample("5T", how=ohlc_dict)
+    # d = d.resample("5T", how=ohlc_dict)
     print symbol, d.shape[0], d["v"].sum()
     temp.append(d[["c"]])
 

@@ -2,6 +2,7 @@ import requests
 import datetime
 import pandas as pd
 import numpy as np
+from StringIO import StringIO
 
 pd.set_option("display.width", 10000)
 pd.set_option("display.max_rows", 10000)
@@ -34,8 +35,36 @@ def get_intraday_data(symbol, interval_seconds=301, num_days=10):
     return df
 
 
-d = get_intraday_data("SPU", 61, 1)
+urls = [
+    "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NASDAQ&render=download",
+    "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=NYSE&render=download",
+    "http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=AMEX&render=download",
+]
 
-print d.index[0], d.index[-1]
+symbols = []
+for url in urls:
+    content = requests.get(url).content
+    d = pd.DataFrame.from_csv(StringIO(content))
+    symbols += list(d.index.values)
 
-print d
+symbols = map(lambda s: s.strip(), symbols)
+
+symbols = sorted(set(symbols))
+
+print len(symbols)
+
+store = pd.HDFStore("google.h5")
+
+for symbol in symbols:
+
+    if symbol in store:
+        continue
+
+    d = get_intraday_data(symbol, 61, 100)
+
+    print symbol, d.shape
+
+    if d.shape[0] > 0:
+        store[symbol] = d
+
+store.close()
